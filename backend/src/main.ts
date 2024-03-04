@@ -6,12 +6,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
- 
+
+  app.enableCors({
+    // origin: whitelist,
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Youtube-Clone API')
     .setDescription('Youtube-Clone API description')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth()
     .addTag('video')
     .addTag('user')
     .addTag('auth')

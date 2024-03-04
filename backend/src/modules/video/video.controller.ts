@@ -23,7 +23,7 @@ export class VideoController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('asd', {
+    FileInterceptor('video', {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -35,12 +35,20 @@ export class VideoController {
     }),
   )
   @ApiConsumes('multipart/form-data')
-  @ApiParam({
-    name: 'asd',
-    required: true,
-    type: 'file',
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
   })
   async create(@UploadedFile() file: Express.Multer.File) {
+    console.log('file', file);
+    
     console.log(file);
 
     return file.filename;
