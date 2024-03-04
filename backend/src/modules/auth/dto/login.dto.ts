@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class CreateUserDto {
+export class LoginDto {
   @ApiProperty({ default: 'new user' })
   @IsString()
   username: string;
@@ -9,8 +9,4 @@ export class CreateUserDto {
   @ApiProperty({ default: '1234' })
   @IsString()
   password: string;
-
-  @ApiProperty({ default: 'admin' })
-  @IsString()
-  role: string;
 }
