@@ -1,7 +1,7 @@
 {
-	"name": "dev api-youtube-backend-clone-nestjs-postgres",
+	"name": "dev api-youtube-backend-clone-nestjs",
 	"dockerComposeFile": "./docker-compose.yml",
-	"service": "api-youtube-backend-clone-nestjs-postgres",
+	"service": "api-youtube-backend-clone-nestjs",
 	"workspaceFolder": "/api",
 	"shutdownAction": "stopCompose",
 	"settings": {},
