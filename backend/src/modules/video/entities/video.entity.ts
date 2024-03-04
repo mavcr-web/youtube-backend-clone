@@ -11,8 +11,8 @@ export class Video {
   @Column()
   description: string;
 
-  @Column({ default: [] })
-  tags: string[];
+  @Column()
+  tags: string;
 
   @Column()
   uploadDate: Date;
