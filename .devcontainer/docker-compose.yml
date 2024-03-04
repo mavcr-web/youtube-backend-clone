@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+
+  api-youtube-backend-clone-nestjs:
+    container_name: api-youtube-backend-clone-nestjs
+    tty: true
+    build: .
+    volumes:
+      - ../:/api
+    environment:
+      - SECRET=changepassword
+      - SQL_TYPE=postgres
+      - SQL_HOST=api-youtube-backend-clone-nestjs-postgres
+      - SQL_USERNAME=root
+      - SQL_PASSWORD=root
+      - SQL_DATABASE=youtube
+      - WHITE_LIST=http://localhost:4200,http://localhost:8080
+    links:
+      - api-youtube-backend-clone-nestjs-postgres
+    ports:
+      - "3000:3000"
+
+  api-youtube-backend-clone-nestjs-postgres:
+    container_name: api-youtube-backend-clone-nestjs-postgres
+    image: postgres:14
+    environment:
+      # - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=youtube
+    volumes:
+      - ../databases/postgres-db:/var/lib/postgresql/data/
+      - ../databases/postgres-backup:/backup
