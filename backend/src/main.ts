@@ -13,9 +13,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
+  const whitelist = process.env.WHITE_LIST.split(',')
+
   app.enableCors({
-    // origin: whitelist,
-    origin: '*',
+    origin: whitelist,
+    // origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -31,8 +33,8 @@ async function bootstrap() {
     .addTag('auth')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  /* SwaggerModule.setup('api', app, document) 'api' es la ruta donde tendremos la documentacion */
+  SwaggerModule.setup('docs', app, document);
+  /* SwaggerModule.setup('docs', app, document) 'api' es la ruta donde tendremos la documentacion */
 
   await app.listen(3000);
 }
