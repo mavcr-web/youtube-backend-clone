@@ -1,5 +1,5 @@
 # Create image based on the official Node 6 image from dockerhub
-FROM node:20-alpine3.18
+FROM node:16.17-alpine3.16
 
 RUN mkdir -p /api
 
