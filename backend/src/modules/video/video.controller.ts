@@ -16,6 +16,8 @@ import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
 
+import * as ffmpeg from 'fluent-ffmpeg';
+
 import {
   PutObjectCommand,
   GetObjectCommand,
@@ -56,6 +58,12 @@ export class VideoController {
   })
   async create(@UploadedFile() file: Express.Multer.File) {
     try {
+
+      // ffmpeg(file.buffer.).seekInput(30).output('output.mp4').on('end', function() {
+      //   console.log('Finished processing');
+      // }
+      // ).run();
+
       const fileExtName: string = file.originalname.split('.')[1];
 
       console.log('buffer', file.buffer);
