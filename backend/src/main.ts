@@ -27,7 +27,7 @@ async function bootstrap() {
     .setTitle('Youtube-Clone API')
     .setDescription('Youtube-Clone API description')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth() // usar @ApiBearerAuth() en los controladores que requieran autenticacion en swagger
     .addTag('video')
     .addTag('user')
     .addTag('auth')
