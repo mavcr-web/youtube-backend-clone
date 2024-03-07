@@ -12,11 +12,14 @@ export class Video {
   description: string;
 
   @Column()
-  tags: string;
+  keyCloud: string;
 
   @Column()
   uploadDate: Date;
 
   @Column()
   idUser: number;
+
+  @Column()
+  visibility: string;
 }

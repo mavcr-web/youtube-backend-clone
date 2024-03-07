@@ -14,9 +14,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { ApiBody, ApiConsumes, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import * as ffmpeg from 'fluent-ffmpeg';
+import { FfmpegCommand, ffprobe } from 'fluent-ffmpeg';
 
 import {
   PutObjectCommand,
@@ -28,11 +28,14 @@ import {
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { JwtAuthGuard } from '../auth/jwt-guard.guard';
+import {
+  UserDecorator,
+  UserDecoratorInterface,
+} from 'shared/decorators/user.decorator';
 
 @ApiTags('video')
 @Controller('video')
 export class VideoController {
-  
   private s3Client = new S3Client({
     region: process.env.AWS_BUCKET_REGION,
     credentials: {
@@ -42,7 +45,9 @@ export class VideoController {
   });
   constructor(private readonly videoService: VideoService) {}
 
-  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post(':visibility')
   @UseInterceptors(FileInterceptor('video'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -56,64 +61,27 @@ export class VideoController {
       },
     },
   })
-  async create(@UploadedFile() file: Express.Multer.File) {
-    try {
-
-      // ffmpeg(file.buffer.).seekInput(30).output('output.mp4').on('end', function() {
-      //   console.log('Finished processing');
-      // }
-      // ).run();
-
-      const fileExtName: string = file.originalname.split('.')[1];
-
-      console.log('buffer', file.buffer);
-
-      const command = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `${Date.now()}.${fileExtName}`,
-        Body: file.buffer,
-      });
-
-      const response = await this.s3Client.send(command);
-      return { upload: 'success' };
-    } catch (error) {
-      console.log('error', error);
-    }
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @UserDecorator() user: UserDecoratorInterface,
+    @Param('visibility') visibility: string,
+  ) {
+    return this.videoService.create(file, user, visibility);
   }
-  // create(@Body() createVideoDto: CreateVideoDto, @UploadedFile() file: Express.Multer.File) {
-  //   return this.videoService.create(createVideoDto);
-  // }
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  async findAll() {
-    try {
-      const command = new ListObjectsCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-      });
 
-      return await this.s3Client.send(command);
-    } catch (error) {
-      console.log('error', error);
-    }
-    // return this.videoService.findAll();
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get()
+  async findAll(@UserDecorator() user: UserDecoratorInterface) {
+    return this.videoService.findAll(user);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `${id}`,
-      });
-
-      const url = await getSignedUrl(this.s3Client, command, {
-        expiresIn: 3600,
-      });
-
-      return { url };
-    } catch (error) {
-      console.log('error', error);
-    }
+  async findOne(
+    @Param('id') id: number,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.videoService.findOne(id, user);
   }
 
   @Patch(':id')
