@@ -35,22 +35,6 @@ export class VideoService {
     visibility: string,
   ) {
     try {
-      // const command2 = new FfmpegCommand({source: './test/Mi instinto LATINO aqui en ALEMANIA _1080pFHR.mp4'})
-
-      // command2.screenshots({
-      //   timestamps: ['50%'],
-      //   filename: `${file.originalname.split('.')[0]}.png`,
-      //   folder: './test',
-      //   size: '320x240',
-      // });
-      // ffmpeg(
-      //   './test/Mi instinto LATINO aqui en ALEMANIA _1080pFHR.mp4',
-      // ).screenshots({
-      //   timestamps: ['50%'],
-      //   filename: `${file.originalname.split('.')[0]}.png`,
-      //   folder: './test',
-      //   size: '320x240',
-      // });
       const fileExtName: string = file.originalname.split('.')[1];
 
       const key = `${Date.now()}.${fileExtName}`;
@@ -119,7 +103,10 @@ export class VideoService {
 
       // return await this.s3Client.send(command);
 
-      return await this.videoRepository.find({ take: 100 });
+      return await this.videoRepository.find({
+        take: 100,
+        where: { visibility: 'public' },
+      });
     } catch (error) {
       console.log('error', error);
       return { error: error.message };
