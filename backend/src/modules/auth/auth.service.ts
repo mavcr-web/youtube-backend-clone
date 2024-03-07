@@ -38,4 +38,11 @@ export class AuthService {
       role: 'user',
     });
   }
+
+  async registerAdmin(registerDto: RegisterDto) {
+    return this.userService.register({
+      ...registerDto,
+      role: 'admin',
+    });
+  }
 }

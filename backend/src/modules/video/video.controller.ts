@@ -8,6 +8,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
@@ -24,6 +25,7 @@ import {
 } from '@aws-sdk/client-s3';
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { JwtAuthGuard } from '../auth/jwt-guard.guard';
 
 @ApiTags('video')
 @Controller('video')
@@ -73,7 +75,7 @@ export class VideoController {
   // create(@Body() createVideoDto: CreateVideoDto, @UploadedFile() file: Express.Multer.File) {
   //   return this.videoService.create(createVideoDto);
   // }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
     try {
