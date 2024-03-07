@@ -14,6 +14,9 @@ export class Video {
   @Column()
   keyCloud: string;
 
+  @Column({ default: '' })
+  thumbnailKeyCloud: string;
+
   @Column()
   uploadDate: Date;
 

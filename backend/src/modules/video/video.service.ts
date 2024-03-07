@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserDecoratorInterface } from 'shared/decorators/user.decorator';
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   ListObjectsCommand,
   PutObjectCommand,
@@ -34,6 +35,22 @@ export class VideoService {
     visibility: string,
   ) {
     try {
+      // const command2 = new FfmpegCommand({source: './test/Mi instinto LATINO aqui en ALEMANIA _1080pFHR.mp4'})
+
+      // command2.screenshots({
+      //   timestamps: ['50%'],
+      //   filename: `${file.originalname.split('.')[0]}.png`,
+      //   folder: './test',
+      //   size: '320x240',
+      // });
+      // ffmpeg(
+      //   './test/Mi instinto LATINO aqui en ALEMANIA _1080pFHR.mp4',
+      // ).screenshots({
+      //   timestamps: ['50%'],
+      //   filename: `${file.originalname.split('.')[0]}.png`,
+      //   folder: './test',
+      //   size: '320x240',
+      // });
       const fileExtName: string = file.originalname.split('.')[1];
 
       const key = `${Date.now()}.${fileExtName}`;
@@ -62,33 +79,86 @@ export class VideoService {
     }
   }
 
-  async findAll(user: UserDecoratorInterface) {
+  async thumbnail(
+    file: Express.Multer.File,
+    user: UserDecoratorInterface,
+    id: number,
+  ) {
     try {
-      if (user.role != 'admin') {
-        throw new Error('Unauthorized');
-      }
-      const command = new ListObjectsCommand({
+      const db = await this.videoRepository.findOne({ where: { id: id } });
+      const fileExtName: string = file.originalname.split('.')[1];
+
+      const key = `${Date.now()}.${fileExtName}`;
+
+      const command = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        Body: file.buffer,
       });
 
-      return await this.s3Client.send(command);
+      const response = await this.s3Client.send(command);
+
+      const dbUpdated = await this.videoRepository.update(
+        { id: id },
+        { thumbnailKeyCloud: key },
+      );
+      return dbUpdated;
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+
+  async findAll(user: UserDecoratorInterface) {
+    try {
+      // if (user.role != 'admin') {
+      //   throw new Error('Unauthorized');
+      // }
+      // const command = new ListObjectsCommand({
+      //   Bucket: process.env.AWS_BUCKET_NAME,
+      // });
+
+      // return await this.s3Client.send(command);
+
+      return await this.videoRepository.find({ take: 100 });
     } catch (error) {
       console.log('error', error);
       return { error: error.message };
     }
   }
 
+  async findAllMyVideos(user: UserDecoratorInterface) {
+    try {
+      // if (user.role != 'admin') {
+      //   throw new Error('Unauthorized');
+      // }
+      // const command = new ListObjectsCommand({
+      //   Bucket: process.env.AWS_BUCKET_NAME,
+      // });
+
+      // return await this.s3Client.send(command);
+
+      return await this.videoRepository.find({
+        take: 100,
+        where: { idUser: user.id },
+      });
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+
   async findOne(id: number, user: UserDecoratorInterface) {
     try {
+      console.log('id', id);
+
       const db = await this.videoRepository.findOne({ where: { id: id } });
 
       if (!db) {
         throw new Error('Video not found');
       }
 
-      if (db.visibility === 'private' && db.idUser !== user.id) {
-        throw new Error('Unauthorized');
-      }
+      // if (db.visibility === 'private' && db.idUser !== user.id) {
+      //   throw new Error('Unauthorized');
+      // }
 
       const command = new GetObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -105,11 +175,50 @@ export class VideoService {
     }
   }
 
+  async findOneThumbnail(id: number, user: UserDecoratorInterface) {
+    try {
+      const db = await this.videoRepository.findOne({ where: { id: id } });
+
+      if (!db) {
+        throw new Error('Video not found');
+      }
+
+      // if (db.visibility === 'private' && db.idUser !== user.id) {
+      //   throw new Error('Unauthorized');
+      // }
+
+      const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${db.thumbnailKeyCloud}`,
+      });
+
+      const url = await getSignedUrl(this.s3Client, command, {
+        expiresIn: 3600,
+      });
+
+      return { url };
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
   update(id: number, updateVideoDto: UpdateVideoDto) {
     return `This action updates a #${id} video`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} video`;
+  async remove(id: number) {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${id}`,
+      });
+
+      await this.s3Client.send(command);
+
+      const db = await this.videoRepository.delete({ id: id });
+      return db;
+    } catch (error) {
+      console.log('error', error);
+    }
   }
 }

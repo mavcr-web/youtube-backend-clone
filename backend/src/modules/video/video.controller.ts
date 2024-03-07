@@ -15,18 +15,6 @@ import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { ApiBody, ApiConsumes, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-
-import { FfmpegCommand, ffprobe } from 'fluent-ffmpeg';
-
-import {
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-  ListObjectsCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
-
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { JwtAuthGuard } from '../auth/jwt-guard.guard';
 import {
   UserDecorator,
@@ -36,13 +24,6 @@ import {
 @ApiTags('video')
 @Controller('video')
 export class VideoController {
-  private s3Client = new S3Client({
-    region: process.env.AWS_BUCKET_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-  });
   constructor(private readonly videoService: VideoService) {}
 
   @UseGuards(JwtAuthGuard)
@@ -69,11 +50,42 @@ export class VideoController {
     return this.videoService.create(file, user, visibility);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  @Post('/thumbnail/:id')
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async thumbnail(
+    @UploadedFile() file: Express.Multer.File,
+    @UserDecorator() user: UserDecoratorInterface,
+    @Param('id') id: number,
+  ) {
+    return this.videoService.thumbnail(file, user, id);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @Get()
   async findAll(@UserDecorator() user: UserDecoratorInterface) {
     return this.videoService.findAll(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('/my-videos')
+  async findAllMyVideos(@UserDecorator() user: UserDecoratorInterface) {
+    return this.videoService.findAllMyVideos(user);
   }
 
   @Get(':id')
@@ -84,22 +96,21 @@ export class VideoController {
     return this.videoService.findOne(id, user);
   }
 
+  @Get('/thumbnail/:id')
+  async findOneThumbnail(
+    @Param('id') id: number,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.videoService.findOneThumbnail(id, user);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto) {
     return this.videoService.update(+id, updateVideoDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    try {
-      const command = new DeleteObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `${id}`,
-      });
-
-      await this.s3Client.send(command);
-    } catch (error) {
-      console.log('error', error);
-    }
+  async remove(@Param('id') id: number) {
+    return this.videoService.remove(id);
   }
 }
