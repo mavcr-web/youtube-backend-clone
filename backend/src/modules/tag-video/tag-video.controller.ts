@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { TagVideoService } from './tag-video.service';
 import { CreateTagVideoDto } from './dto/create-tag-video.dto';
 import { UpdateTagVideoDto } from './dto/update-tag-video.dto';
@@ -13,22 +22,22 @@ export class TagVideoController {
   }
 
   @Get()
-  findAll() {
-    return this.tagVideoService.findAll();
+  findAll(@Query('name') name: string) {
+    return this.tagVideoService.findAll(name);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tagVideoService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.tagVideoService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTagVideoDto: UpdateTagVideoDto) {
-    return this.tagVideoService.update(+id, updateTagVideoDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTagVideoDto: UpdateTagVideoDto) {
+  //   return this.tagVideoService.update(+id, updateTagVideoDto);
+  // }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.tagVideoService.remove(+id);
   }
 }

@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { UpdateFollowDto } from './dto/update-follow.dto';
+import { Follow } from './entities/follow.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class FollowService {
+  constructor(
+    @InjectRepository(Follow)
+    private readonly followRepository: Repository<Follow>,
+  ) {}
   create(createFollowDto: CreateFollowDto) {
     return 'This action adds a new follow';
   }

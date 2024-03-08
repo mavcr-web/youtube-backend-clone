@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLikeVideoDto } from './dto/create-like-video.dto';
 import { UpdateLikeVideoDto } from './dto/update-like-video.dto';
+import { LikeComment } from '../like-comment/entities/like-comment.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class LikeVideoService {
+  constructor(
+    @InjectRepository(LikeComment)
+    private readonly likeCommentRepository: Repository<LikeComment>,
+  ) {}
   create(createLikeVideoDto: CreateLikeVideoDto) {
     return 'This action adds a new likeVideo';
   }

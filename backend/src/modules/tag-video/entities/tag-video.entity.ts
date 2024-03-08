@@ -6,8 +6,8 @@ export class TagVideo {
   id: number;
 
   @Column()
-  idVideo: string;
+  idVideo: number;
 
   @Column()
-  idTag: string;
+  idTag: number;
 }
