@@ -30,28 +30,45 @@ export class VideoService {
   ) {}
 
   async create(
-    file: Express.Multer.File,
+    video: Express.Multer.File,
+    thumbnail: Express.Multer.File,
     user: UserDecoratorInterface,
     visibility: string,
   ) {
     try {
-      const fileExtName: string = file.originalname.split('.')[1];
+      // video
+      const videoExtName: string = video.originalname.split('.')[1];
 
-      const key = `${Date.now()}.${fileExtName}`;
+      const key = `${Date.now()}.${videoExtName}`;
 
       const command = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: key,
-        Body: file.buffer,
+        Body: video.buffer,
       });
 
-      const response = await this.s3Client.send(command);
+      await this.s3Client.send(command);
 
+      // thumbnail
+      const thumbnailExtName: string = thumbnail.originalname.split('.')[1];
+
+      const keyThumbnail = `${Date.now()}.${thumbnailExtName}`;
+
+      const commandThumbnail = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: keyThumbnail,
+        Body: thumbnail.buffer,
+      });
+
+      await this.s3Client.send(commandThumbnail);
+
+      // db
       const createVideoDto: CreateVideoDto = {
-        title: file.originalname,
-        description: file.originalname,
+        title: video.originalname,
+        description: video.originalname,
         idUser: user.id,
         keyCloud: key,
+        thumbnailKeyCloud: keyThumbnail,
         visibility: visibility,
         uploadDate: new Date(),
       };
@@ -193,17 +210,36 @@ export class VideoService {
     return `This action updates a #${id} video`;
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: UserDecoratorInterface) {
     try {
-      const command = new DeleteObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `${id}`,
-      });
+      const db = await this.videoRepository.findOne({ where: { id: id } });
 
-      await this.s3Client.send(command);
+      if (!db) {
+        throw new Error('Video not found');
+      }
 
-      const db = await this.videoRepository.delete({ id: id });
-      return db;
+      if (user.role != 'admin' && db.idUser !== user.id) {
+        throw new Error('Unauthorized');
+      }
+
+      if (db.keyCloud) {
+        const commandVideo = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: `${db.keyCloud}`,
+        });
+        await this.s3Client.send(commandVideo);
+      }
+
+      if (db.thumbnailKeyCloud) {
+        const commandThumbnail = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: `${db.thumbnailKeyCloud}`,
+        });
+        await this.s3Client.send(commandThumbnail);
+      }
+
+      const deleted = await this.videoRepository.delete({ id: id });
+      return deleted;
     } catch (error) {
       console.log('error', error);
     }

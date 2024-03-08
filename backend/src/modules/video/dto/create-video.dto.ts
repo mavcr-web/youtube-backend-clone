@@ -10,6 +10,9 @@ export class CreateVideoDto {
   @IsString()
   keyCloud: string;
 
+  @IsString()
+  thumbnailKeyCloud: string;
+
   @IsNumber()
   idUser: number;
 

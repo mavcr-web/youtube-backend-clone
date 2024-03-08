@@ -9,8 +9,9 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -29,7 +30,7 @@ export class VideoController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post(':visibility')
-  @UseInterceptors(FileInterceptor('video'))
+  @UseInterceptors(FilesInterceptor('video'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -43,11 +44,13 @@ export class VideoController {
     },
   })
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File,
     @UserDecorator() user: UserDecoratorInterface,
     @Param('visibility') visibility: string,
   ) {
-    return this.videoService.create(file, user, visibility);
+    const video = files[0];
+    const thumbnail = files[1];
+    return this.videoService.create(video, thumbnail, user, visibility);
   }
 
   // @UseGuards(JwtAuthGuard)
@@ -109,8 +112,13 @@ export class VideoController {
     return this.videoService.update(+id, updateVideoDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return this.videoService.remove(id);
+  async remove(
+    @Param('id') id: number,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.videoService.remove(id, user);
   }
 }
