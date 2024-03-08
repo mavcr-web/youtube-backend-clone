@@ -3,7 +3,7 @@ import { CreateTagVideoDto } from './dto/create-tag-video.dto';
 import { UpdateTagVideoDto } from './dto/update-tag-video.dto';
 import { TagVideo } from './entities/tag-video.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class TagVideoService {
@@ -20,8 +20,24 @@ export class TagVideoService {
     try {
       const where: any = {};
       name && name !== ''
-        ? (where.title = Like(`%${name.toLowerCase()}%`))
+        ? (where.name = Like(`%${name.toLowerCase()}%`))
         : null;
+
+      return await this.tagVideoRepository.find({
+        take: 100,
+        where: where,
+      });
+    } catch (error) {
+      console.log('error', error);
+      return { error: error.message };
+    }
+  }
+
+  async findAllById(ids: number[]) {
+    try {
+      const where: any = {};
+
+      where.id = In(ids);
 
       return await this.tagVideoRepository.find({
         take: 100,

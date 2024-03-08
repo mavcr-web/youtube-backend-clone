@@ -11,23 +11,41 @@ export class HistoryService {
     @InjectRepository(History)
     private readonly historyRepository: Repository<History>,
   ) {}
-  create(createHistoryDto: CreateHistoryDto) {
-    return 'This action adds a new history';
+  async create(createHistoryDto: CreateHistoryDto, idUser: number) {
+    try {
+      createHistoryDto.idUser = idUser;
+      const db = await this.historyRepository.save(createHistoryDto);
+
+      return db;
+    } catch (error) {
+      return { error: error.message };
+    }
   }
 
-  findAll() {
-    return `This action returns all history`;
+  async findAll(id: number) {
+    try {
+      const where: any = {};
+      id ? (where.idUser = id) : null;
+
+      return await this.historyRepository.find({
+        take: 100,
+        where: where,
+      });
+    } catch (error) {
+      console.log('error', error);
+      return { error: error.message };
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} history`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} history`;
+  // }
 
-  update(id: number, updateHistoryDto: UpdateHistoryDto) {
-    return `This action updates a #${id} history`;
-  }
+  // update(id: number, updateHistoryDto: UpdateHistoryDto) {
+  //   return `This action updates a #${id} history`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} history`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} history`;
+  // }
 }

@@ -6,8 +6,8 @@ export class History {
   id: number;
 
   @Column()
-  idUser: string;
+  idUser: number;
 
   @Column()
-  idVideo: string;
+  idVideo: number;
 }

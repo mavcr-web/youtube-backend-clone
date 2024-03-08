@@ -31,6 +31,7 @@ async function bootstrap() {
     .addTag('video')
     .addTag('user')
     .addTag('auth')
+    .addTag('history')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

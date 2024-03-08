@@ -1,1 +1,9 @@
-export class CreateHistoryDto {}
+import { IsNumber } from 'class-validator';
+
+export class CreateHistoryDto {
+  @IsNumber()
+  idUser: number;
+
+  @IsNumber()
+  idVideo: number;
+}

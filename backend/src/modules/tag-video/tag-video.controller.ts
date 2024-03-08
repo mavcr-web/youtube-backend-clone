@@ -22,8 +22,8 @@ export class TagVideoController {
   }
 
   @Get()
-  findAll(@Query('name') name: string) {
-    return this.tagVideoService.findAll(name);
+  findAll(@Query('id') ids: number[]) {
+    return this.tagVideoService.findAllById(ids);
   }
 
   // @Get(':id')
