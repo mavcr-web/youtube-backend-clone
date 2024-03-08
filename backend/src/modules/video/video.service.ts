@@ -150,6 +150,26 @@ export class VideoService {
     }
   }
 
+  async findAllChannelVideos(idChannel: number, user: UserDecoratorInterface) {
+    try {
+      // if (user.role != 'admin') {
+      //   throw new Error('Unauthorized');
+      // }
+      // const command = new ListObjectsCommand({
+      //   Bucket: process.env.AWS_BUCKET_NAME,
+      // });
+
+      // return await this.s3Client.send(command);
+
+      return await this.videoRepository.find({
+        take: 100,
+        where: { idUser: idChannel },
+      });
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
+
   async findOne(id: number, user: UserDecoratorInterface) {
     try {
       console.log('id', id);
@@ -173,7 +193,7 @@ export class VideoService {
         expiresIn: 3600,
       });
 
-      return { url };
+      return { url, idUser: db.idUser };
     } catch (error) {
       console.log('error', error);
     }
