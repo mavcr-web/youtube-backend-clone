@@ -24,5 +24,11 @@ export class Video {
   idUser: number;
 
   @Column()
-  visibility: string;
+  visibility: Visibility;
+}
+
+export enum Visibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  FOLLOWER = 'followers',
 }

@@ -1,4 +1,5 @@
 import { IsDate, IsNumber, IsString, isString } from 'class-validator';
+import { Visibility } from '../entities/video.entity';
 
 export class CreateVideoDto {
   @IsString()
@@ -17,7 +18,7 @@ export class CreateVideoDto {
   idUser: number;
 
   @IsString()
-  visibility: string;
+  visibility: Visibility;
 
   @IsDate()
   uploadDate: Date;

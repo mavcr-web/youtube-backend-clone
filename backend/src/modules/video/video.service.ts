@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-import { Video } from './entities/video.entity';
+import { Video, Visibility } from './entities/video.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { UserDecoratorInterface } from 'shared/decorators/user.decorator';
 import {
   DeleteObjectCommand,
@@ -33,7 +33,7 @@ export class VideoService {
     video: Express.Multer.File,
     thumbnail: Express.Multer.File,
     user: UserDecoratorInterface,
-    visibility: string,
+    visibility: Visibility,
   ) {
     try {
       // video
@@ -64,8 +64,8 @@ export class VideoService {
 
       // db
       const createVideoDto: CreateVideoDto = {
-        title: video.originalname,
-        description: video.originalname,
+        title: video.originalname.toLowerCase(),
+        description: video.originalname.toLocaleLowerCase(),
         idUser: user.id,
         keyCloud: key,
         thumbnailKeyCloud: keyThumbnail,
@@ -109,7 +109,7 @@ export class VideoService {
     }
   }
 
-  async findAll(user: UserDecoratorInterface) {
+  async findAll(title: string, user: UserDecoratorInterface) {
     try {
       // if (user.role != 'admin') {
       //   throw new Error('Unauthorized');
@@ -119,10 +119,15 @@ export class VideoService {
       // });
 
       // return await this.s3Client.send(command);
+      const where: any = {};
+      where.visibility = 'public';
+      title && title !== ''
+        ? (where.title = Like(`%${title.toLowerCase()}%`))
+        : null;
 
       return await this.videoRepository.find({
         take: 100,
-        where: { visibility: 'public' },
+        where: where,
       });
     } catch (error) {
       console.log('error', error);
@@ -172,8 +177,6 @@ export class VideoService {
 
   async findOne(id: number, user: UserDecoratorInterface) {
     try {
-      console.log('id', id);
-
       const db = await this.videoRepository.findOne({ where: { id: id } });
 
       if (!db) {

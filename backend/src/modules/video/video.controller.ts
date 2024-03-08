@@ -10,6 +10,7 @@ import {
   UploadedFile,
   UseGuards,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
@@ -21,6 +22,7 @@ import {
   UserDecorator,
   UserDecoratorInterface,
 } from 'shared/decorators/user.decorator';
+import { Visibility } from './entities/video.entity';
 
 @ApiTags('video')
 @Controller('video')
@@ -46,7 +48,7 @@ export class VideoController {
   async create(
     @UploadedFiles() files: Express.Multer.File,
     @UserDecorator() user: UserDecoratorInterface,
-    @Param('visibility') visibility: string,
+    @Param('visibility') visibility: Visibility,
   ) {
     const video = files[0];
     const thumbnail = files[1];
@@ -79,9 +81,12 @@ export class VideoController {
 
   // @UseGuards(JwtAuthGuard)
   // @ApiBearerAuth()
-  @Get()
-  async findAll(@UserDecorator() user: UserDecoratorInterface) {
-    return this.videoService.findAll(user);
+  @Get('')
+  async findAll(
+    @Query('title') title: string,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.videoService.findAll(title, user);
   }
 
   @UseGuards(JwtAuthGuard)
