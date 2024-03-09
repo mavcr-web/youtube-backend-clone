@@ -8,6 +8,7 @@ Aquí puedes documentar los pasos necesarios para desplegar tu aplicación.
 - [ ] Configurar las variables de entorno
 
 - SECRET
+- PORT
 - SQL_TYPE # ejemplo postgres
 - SQL_HOST
 - SQL_USERNAME

@@ -105,6 +105,11 @@ export class VideoController {
     return this.videoService.findAllMyVideos(user);
   }
 
+  @Get('/channel-videos/:id')
+  async findAllChanelVideos(@Param(':id') id: number) {
+    return this.videoService.findAllChannelVideos(id);
+  }
+
   @Get(':id')
   async findOne(
     @Param('id') id: number,

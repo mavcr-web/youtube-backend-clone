@@ -157,7 +157,7 @@ export class VideoService {
     }
   }
 
-  async findAllChannelVideos(idChannel: number, user: UserDecoratorInterface) {
+  async findAllChannelVideos(idChannel: number) {
     try {
       // if (user.role != 'admin') {
       //   throw new Error('Unauthorized');
@@ -170,7 +170,7 @@ export class VideoService {
 
       return await this.videoRepository.find({
         take: 100,
-        where: { idUser: idChannel },
+        where: { idUser: idChannel, visibility: Visibility.PUBLIC },
       });
     } catch (error) {
       return { error: error.message };

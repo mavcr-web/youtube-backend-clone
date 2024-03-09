@@ -3,17 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import * as dotenv from "dotenv";
-
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
-
   dotenv.config();
-  
+
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
-  const whitelist = process.env.WHITE_LIST.split(',')
+  const whitelist = process.env.WHITE_LIST.split(',');
 
   app.enableCors({
     origin: whitelist,
@@ -37,6 +35,8 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
   /* SwaggerModule.setup('docs', app, document) 'api' es la ruta donde tendremos la documentacion */
 
-  await app.listen(3000);
+  const PORT = process.env.PORT || 3000;
+
+  await app.listen(PORT);
 }
 bootstrap();
