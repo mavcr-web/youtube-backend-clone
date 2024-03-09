@@ -38,8 +38,6 @@ export class VideoService {
     description: string,
   ) {
     try {
-      console.log(name, description, visibility, user.id);
-
       // video
       const videoExtName: string = video.originalname.split('.')[1];
 
@@ -77,13 +75,9 @@ export class VideoService {
         uploadDate: new Date(),
       };
 
-      console.log('createVideoDto', createVideoDto);
-
       const db = await this.videoRepository.save(createVideoDto);
       return db;
     } catch (error) {
-      console.log('error', error);
-
       return { error: error.message };
     }
   }

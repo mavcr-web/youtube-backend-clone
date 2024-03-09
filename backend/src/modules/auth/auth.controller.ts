@@ -37,4 +37,9 @@ export class AuthController {
   registerAdmin(@Body() registerDto: RegisterDto) {
     return this.authService.registerAdmin(registerDto);
   }
+
+  @Post('register-first-admin')
+  registerFirstAdmin(@Body() registerDto: RegisterDto) {
+    return this.authService.registerFirstAdmin(registerDto);
+  }
 }

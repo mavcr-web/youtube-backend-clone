@@ -45,4 +45,12 @@ export class AuthService {
       role: 'admin',
     });
   }
+
+  async registerFirstAdmin(registerDto: RegisterDto) {
+    return this.userService.firstRegister({
+      username: registerDto.username,
+      password: registerDto.password,
+      role: 'admin',
+    });
+  }
 }

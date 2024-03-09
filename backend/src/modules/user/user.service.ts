@@ -33,8 +33,20 @@ export class UserService {
 
     const encryptedPassword = await hash(createUserDto.password, 10);
     createUserDto.password = encryptedPassword;
-    createUserDto.role = 'user';
+
     if (!dbUser) {
+      const newUser = await this.userRepository.save(createUserDto);
+      return newUser;
+    }
+  }
+
+  async firstRegister(createUserDto: CreateUserDto) {
+    const dbUser = await this.userRepository.find();
+
+    const encryptedPassword = await hash(createUserDto.password, 10);
+    createUserDto.password = encryptedPassword;
+
+    if (dbUser.length === 0) {
       const newUser = await this.userRepository.save(createUserDto);
       return newUser;
     }
@@ -46,7 +58,7 @@ export class UserService {
 
   async findOne(id: number) {
     console.log(id);
-    
+
     const db = await this.userRepository.findOne({ where: { id: id } });
     db.password = undefined;
     return db;
@@ -65,5 +77,13 @@ export class UserService {
       where: { username: username },
     });
     return user;
+  }
+
+  async checkIfDoesNotExistUserInDb() {
+    const db = await this.userRepository.find({ take: 1 });
+    if (db.length === 0) {
+      return true;
+    }
+    return false;
   }
 }
