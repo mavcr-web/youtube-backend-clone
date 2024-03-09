@@ -6,8 +6,8 @@ export class LikeVideo {
   id: number;
 
   @Column()
-  idVideo: string;
+  idVideo: number;
 
   @Column()
-  idUser: string;
+  idUser: number;
 }

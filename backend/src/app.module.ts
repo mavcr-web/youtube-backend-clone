@@ -6,6 +6,7 @@ import { UserModule } from './modules/user/user.module';
 import { VideoModule } from './modules/video/video.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HistoryModule } from './modules/history/history.module';
+import { LikeVideoModule } from './modules/like-video/like-video.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HistoryModule } from './modules/history/history.module';
     AuthModule,
     ConfigurationModule,
     HistoryModule,
+    LikeVideoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

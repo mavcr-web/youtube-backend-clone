@@ -6,8 +6,8 @@ export class Follow {
   id: number;
 
   @Column()
-  idUser: string;
+  idUser: number;
 
   @Column()
-  idFollowed: string;
+  idFollowed: number;
 }

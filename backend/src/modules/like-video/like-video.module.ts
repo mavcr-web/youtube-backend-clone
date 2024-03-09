@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { LikeVideoService } from './like-video.service';
 import { LikeVideoController } from './like-video.controller';
-import { LikeComment } from '../like-comment/entities/like-comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LikeVideo } from './entities/like-video.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LikeComment])],
+  imports: [TypeOrmModule.forFeature([LikeVideo])],
   controllers: [LikeVideoController],
   providers: [LikeVideoService],
 })

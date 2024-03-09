@@ -11,8 +11,9 @@ export class LikeCommentService {
     @InjectRepository(LikeComment)
     private readonly likeCommentRepository: Repository<LikeComment>,
   ) {}
-  create(createLikeCommentDto: CreateLikeCommentDto) {
-    return 'This action adds a new likeComment';
+  async create(createLikeCommentDto: CreateLikeCommentDto, idUser: number) {
+    const db = await this.likeCommentRepository.save(createLikeCommentDto);
+    return db;
   }
 
   findAll() {
