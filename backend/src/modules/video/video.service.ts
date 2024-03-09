@@ -202,6 +202,20 @@ export class VideoService {
     }
   }
 
+  async findOneEntity(id: number) {
+    try {
+      const db = await this.videoRepository.findOne({ where: { id: id } });
+
+      if (!db) {
+        throw new Error('Video not found');
+      }
+
+      return db;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
   async findOneThumbnail(id: number, user: UserDecoratorInterface) {
     try {
       const db = await this.videoRepository.findOne({ where: { id: id } });

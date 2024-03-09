@@ -104,6 +104,11 @@ export class VideoController {
     return this.videoService.findOne(id, user);
   }
 
+  @Get('/entity/:id')
+  async findOneEntity(@Param('id') id: number) {
+    return this.videoService.findOneEntity(id);
+  }
+
   @Get('/thumbnail/:id')
   async findOneThumbnail(
     @Param('id') id: number,

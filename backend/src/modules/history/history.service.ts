@@ -30,6 +30,7 @@ export class HistoryService {
       return await this.historyRepository.find({
         take: 100,
         where: where,
+        order: { id: 'DESC' },
       });
     } catch (error) {
       console.log('error', error);
