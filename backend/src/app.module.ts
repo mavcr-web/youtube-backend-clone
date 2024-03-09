@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { HistoryModule } from './modules/history/history.module';
 import { LikeVideoModule } from './modules/like-video/like-video.module';
 import { CommentModule } from './modules/comment/comment.module';
+import { FollowModule } from './modules/follow/follow.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CommentModule } from './modules/comment/comment.module';
     HistoryModule,
     LikeVideoModule,
     CommentModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

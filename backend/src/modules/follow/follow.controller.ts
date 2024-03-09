@@ -1,15 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { FollowService } from './follow.service';
 import { CreateFollowDto } from './dto/create-follow.dto';
 import { UpdateFollowDto } from './dto/update-follow.dto';
+import {
+  UserDecorator,
+  UserDecoratorInterface,
+} from 'shared/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-guard.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('follow')
 export class FollowController {
   constructor(private readonly followService: FollowService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createFollowDto: CreateFollowDto) {
-    return this.followService.create(createFollowDto);
+  create(
+    @Body() createFollowDto: CreateFollowDto,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.followService.create(createFollowDto, user.id);
   }
 
   @Get()
@@ -17,9 +37,14 @@ export class FollowController {
     return this.followService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.followService.findOne(+id);
+  findOne(
+    @Param('id') id: number,
+    @UserDecorator() user: UserDecoratorInterface,
+  ) {
+    return this.followService.findOne(id, user.id);
   }
 
   @Patch(':id')

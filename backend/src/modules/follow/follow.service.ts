@@ -11,16 +11,40 @@ export class FollowService {
     @InjectRepository(Follow)
     private readonly followRepository: Repository<Follow>,
   ) {}
-  create(createFollowDto: CreateFollowDto) {
-    return 'This action adds a new follow';
+  async create(createFollowDto: CreateFollowDto, idUser: number) {
+    const db = await this.followRepository.findOne({
+      where: {
+        idUser: idUser,
+        idFollowed: createFollowDto.idFollowed,
+      },
+    });
+
+    if (!db) {
+      const dbFollow = await this.followRepository.save({
+        ...createFollowDto,
+        idUser: idUser,
+      });
+      return dbFollow;
+    }
   }
 
   findAll() {
     return `This action returns all follow`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} follow`;
+  async findOne(idUser: number, idFollowed: number) {
+    const db = await this.followRepository.findOne({
+      where: {
+        idUser: idUser,
+        idFollowed: idFollowed,
+      },
+    });
+
+    if (db) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   update(id: number, updateFollowDto: UpdateFollowDto) {
@@ -28,6 +52,6 @@ export class FollowService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} follow`;
+    return this.followRepository.delete(id);
   }
 }
