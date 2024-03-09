@@ -6,10 +6,13 @@ export class Comment {
   id: number;
 
   @Column()
-  idVideo: string;
+  idVideo: number;
 
   @Column()
-  idUser: string;
+  idUser: number;
+
+  @Column()
+  username: string;
 
   @Column()
   comment: string;
