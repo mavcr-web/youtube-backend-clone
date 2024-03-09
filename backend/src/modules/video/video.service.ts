@@ -34,8 +34,12 @@ export class VideoService {
     thumbnail: Express.Multer.File,
     user: UserDecoratorInterface,
     visibility: Visibility,
+    name: string,
+    description: string,
   ) {
     try {
+      console.log(name, description, visibility, user.id);
+
       // video
       const videoExtName: string = video.originalname.split('.')[1];
 
@@ -64,8 +68,8 @@ export class VideoService {
 
       // db
       const createVideoDto: CreateVideoDto = {
-        title: video.originalname.toLowerCase(),
-        description: video.originalname.toLocaleLowerCase(),
+        title: name.toLowerCase(),
+        description: description.toLowerCase(),
         idUser: user.id,
         keyCloud: key,
         thumbnailKeyCloud: keyThumbnail,
@@ -73,9 +77,13 @@ export class VideoService {
         uploadDate: new Date(),
       };
 
+      console.log('createVideoDto', createVideoDto);
+
       const db = await this.videoRepository.save(createVideoDto);
       return db;
     } catch (error) {
+      console.log('error', error);
+
       return { error: error.message };
     }
   }

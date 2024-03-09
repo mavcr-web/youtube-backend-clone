@@ -44,8 +44,12 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    console.log(id);
+    
+    const db = await this.userRepository.findOne({ where: { id: id } });
+    db.password = undefined;
+    return db;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

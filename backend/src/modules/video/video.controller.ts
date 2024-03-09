@@ -49,10 +49,19 @@ export class VideoController {
     @UploadedFiles() files: Express.Multer.File,
     @UserDecorator() user: UserDecoratorInterface,
     @Param('visibility') visibility: Visibility,
+    @Query('name') name: string,
+    @Query('description') description: string,
   ) {
     const video = files[0];
     const thumbnail = files[1];
-    return this.videoService.create(video, thumbnail, user, visibility);
+    return this.videoService.create(
+      video,
+      thumbnail,
+      user,
+      visibility,
+      name,
+      description,
+    );
   }
 
   // @UseGuards(JwtAuthGuard)
