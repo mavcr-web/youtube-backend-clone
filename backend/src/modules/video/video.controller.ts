@@ -12,7 +12,11 @@ import {
   UploadedFiles,
   Query,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
@@ -29,39 +33,68 @@ import { Visibility } from './entities/video.entity';
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post(':visibility')
-  @UseInterceptors(FilesInterceptor('video'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'video', maxCount: 2 },
+      { name: 'thumbnail', maxCount: 2 },
+    ]),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
+        video: {
+          // video
+          // type: 'string',
+          // format: 'binary',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+
+        thumbnail: {
+          // thumbnail
+          // type: 'string',
+          // format: 'binary',
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
         },
       },
     },
   })
   async create(
-    @UploadedFiles() files: Express.Multer.File,
+    @UploadedFiles()
+    files: { video: Express.Multer.File[]; thumbnail: Express.Multer.File[] },
     @UserDecorator() user: UserDecoratorInterface,
-    @Param('visibility') visibility: Visibility,
-    @Query('name') name: string,
-    @Query('description') description: string,
+    // @Param('visibility') visibility: Visibility,
+    // @Query('name') name: string,
+    // @Query('description') description: string,
   ) {
-    const video = files[0];
-    const thumbnail = files[1];
-    return this.videoService.create(
-      video,
-      thumbnail,
-      user,
-      visibility,
-      name,
-      description,
-    );
+    // console.log(files[0].originalname);
+
+    // const video = files[0];
+    // const thumbnail = files[1];
+    // return this.videoService.create(
+    //   video,
+    //   thumbnail,
+    //   user,
+    //   visibility,
+    //   name,
+    //   description,
+    // );
+
+    let f2 = files.video.map((file) => file.originalname);
+    f2 = [...f2, ...files.thumbnail.map((file) => file.originalname)];
+    return f2;
   }
 
   // @UseGuards(JwtAuthGuard)
